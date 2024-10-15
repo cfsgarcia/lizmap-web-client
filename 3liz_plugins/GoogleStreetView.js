@@ -1,5 +1,5 @@
 lizMap.events.on({
-    'lizmapready': function(e) {
+    'uicreated': function(e) {
         // declare here your google maps key compatible with google street view
         var gkey = '_______________________$$$$$$$$$YOUR_KEY$$$$$$$$$_______________________';
         if ( typeof(google) == 'undefined' ) {
