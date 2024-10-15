@@ -15,8 +15,8 @@ class LizGoogleStreeView {
         this.mainLizmap = mainLizmap;
         this.panorama = panorama;
         
-        this._drawLayerStreetView = null;
-        this._feature = null;
+        this._gsvLayer = null;
+        this._gsvFeature = null;
         
         this._drawColor = '#ff0000';
         this._pointRadius = 8;
@@ -34,7 +34,7 @@ class LizGoogleStreeView {
                                                       });
         this.panorama.addListener('pov_changed', () => {
                                                   this._rotation = this.panorama.getPov().heading * (Math.PI/180);
-                                                  this._drawLayerStreetView.changed();
+                                                  this._gsvLayer.changed();
                                                  });
     }
     
@@ -51,26 +51,26 @@ class LizGoogleStreeView {
         geomLiz.transform("EPSG:4326", this.mainLizmap.projection);
         var coord = geomLiz.getCoordinates();
         // update roaming marker coord
-        this._feature.setGeometry(geomLiz);
+        this._gsvFeature.setGeometry(geomLiz);
     }
     
     addLayer() {
-        var drawSourceStreetView = new lizMap.ol.source.Vector({ wrapX: false });
-        this._drawLayerStreetView = new lizMap.ol.layer.Vector({
-            source: drawSourceStreetView
+        var gsvLyrSource = new lizMap.ol.source.Vector({ wrapX: false });
+        this._gsvLayer = new lizMap.ol.layer.Vector({
+            source: gsvLyrSource
         });
-        this._drawLayerStreetView.setStyle(this.setFeatStyle())
-        this._drawLayerStreetView.setProperties({
+        this._gsvLayer.setStyle(this.setFeatStyle())
+        this._gsvLayer.setProperties({
             name: 'google-street-view'
         });
 
-        this.mainLizmap.map.addLayer(this._drawLayerStreetView);
+        this.mainLizmap.map.addLayer(this._gsvLayer);
     }
     
     activateStreetView(){
     	const value = "Point";
     	this._drawInteraction = new lizMap.ol.interaction.Draw({
-	      source: this._drawLayerStreetView.getSource(),
+	      source: this._gsvLayer.getSource(),
 	      type: "Point",
 	    });
 	    
@@ -80,8 +80,8 @@ class LizGoogleStreeView {
 	    	this.mainLizmap.map.removeInteraction(this._drawInteraction);
             this.mainLizmap.map.addInteraction(this._selectInteraction);
             this.mainLizmap.map.addInteraction(this._modifyInteraction);
-            this._feature = event.feature;
-            this.gsvSetPosition(this._feature.getGeometry());
+            this._gsvFeature = event.feature;
+            this.gsvSetPosition(this._gsvFeature.getGeometry());
             this.panorama.setVisible(true);
 	    });
         
@@ -102,7 +102,7 @@ class LizGoogleStreeView {
     	this.mainLizmap.map.removeInteraction(this._drawInteraction);
 	    this.mainLizmap.map.removeInteraction(this._selectInteraction);
         this.mainLizmap.map.removeInteraction(this._modifyInteraction);
-        this._drawLayerStreetView.getSource().clear();
+        this._gsvLayer.getSource().clear();
     }
     
     setFeatStyle() {
